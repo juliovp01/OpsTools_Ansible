@@ -1,0 +1,33 @@
+#- hosts: redis
+#  become: true
+#  roles:
+#    - server/redis-install
+#  tags: redis  
+#- hosts: rabbitmq
+#  become: true
+#  roles:
+#    - server/rabbitmq-install
+#  tags: rabbitmq  
+- hosts: sensu-api
+  become: true
+  roles:
+    - server/sensu-api-install
+  tags: sensu-api  
+
+- hosts: sensu-servers
+  become: true
+  roles:
+    - server/sensu-server-install
+  tags: sensu-server
+
+- hosts: uchiwa
+  become: true
+  roles:
+    - server/uchiwa-install
+  tags: uchiwa
+
+- hosts: haproxy
+  become: true
+  roles:
+    - server/haproxy-keepalived-install
+  tags: haproxy  

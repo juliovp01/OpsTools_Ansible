@@ -1,0 +1,71 @@
+- name: Yum update and install keepalived and haproxy
+  yum:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  with_items:
+    - keepalived
+    - haproxy
+- name: Configure /etc/keepalived/keepalived.conf
+  template:
+    src: keepalived_conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    owner: root
+    group: root
+    mode: 0644
+- name: Configure /etc/haproxy/haproxy.cfg
+  template:
+    src: haproxy_cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+- name: Update SElinux
+  seboolean:
+    name: haproxy_connect_any
+    state: yes
+    persistent: yes
+- name: Update ip forwarding
+  shell: 'echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf ; echo "net.ipv4.ip_nonlocal_bind = 1" >> /etc/sysctl.conf'
+- name: Reboot server
+  shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+  async: 1
+  poll: 0
+  ignore_errors: true
+- name: Wait for system to boot up
+  wait_for: host= "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
+  connection: local
+- debug:
+    msg: "We're back again. Running on {{ inventory_hostname }}"  
+- name: Enable and start keepalived and haproxy
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items:
+    - keepalived
+    - haproxy
+- name: Check if firewalld is installed
+  yum:
+    list: firewalld
+  register: firewalld_op
+- name: Open tcp ports {{ sensu_api_port }}, {{ rabbitmq_vip_port }} and {{ dashboard_port }}
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - "{{ sensu_api_port }}"
+    - "{{ rabbitmq_vip_port }}"
+    - "{{ dashboard_port }}"
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+- name: Verify if keepalives running
+  shell: systemctl status keepalived
+  register: keepalived_status
+- name: Verify if haproxy is running
+  shell: systemctl status haproxy
+  register: haproxy_status
+- fail:
+     msg: "Sensu server is not running"
+  when: keepalived_status.stdout.find("running") == -1 or haproxy_status.stdout.find("running") == -1

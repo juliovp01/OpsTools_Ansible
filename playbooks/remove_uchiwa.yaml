@@ -1,0 +1,4 @@
+- hosts: uchiwa
+  become: true
+  roles:
+    - server/uchiwa-remove

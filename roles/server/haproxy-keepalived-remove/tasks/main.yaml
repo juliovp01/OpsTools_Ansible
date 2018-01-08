@@ -1,0 +1,34 @@
+- name: Remove haproxy and keepalived
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - keepalived
+    - haproxy
+- name: Remove haproxy directory /etc/haproxy
+  file:
+    path: /etc/haproxy
+    state: absent
+- name: Remove keepalived config /etc/keepalived.conf
+  file:
+    path: /etc/keepalived.conf
+    state: absent
+- name: Check if firewalld is installed
+  yum:
+      list: firewalld
+  register: firewalld_op
+- name: Close tcp port {{ sensu_api_port }} for dashboard access
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: disabled
+    immediate: true
+  with_items:
+    - sensu_api_port
+    - rabbitmq_vip_port
+    - dashboard_port
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+
+
+    
+

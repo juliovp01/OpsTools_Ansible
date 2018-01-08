@@ -1,0 +1,4 @@
+- hosts: haproxy
+  become: true
+  roles:
+    - server/haproxy-keepalived-remove

@@ -1,0 +1,33 @@
+- name: Disable sensu repository
+  yum_repository:
+    name: sensu
+    description: EPEL YUM repo
+    baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
+    gpgcheck: no
+    state: absent
+- name: Remove sensu and uchiwa
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - sensu
+    - uchiwa
+- name: Remove sensu directory /etc/sensu
+  file:
+    path: /etc/sensu
+    state: absent
+- name: Check if firewalld is installed
+  yum:
+      list: firewalld
+  register: firewalld_op
+- name: Close tcp port 3000 for dashboard access
+  firewalld:
+    port: "{{ dashboard_port }}/tcp"
+    permanent: true
+    state: disabled
+    immediate: true
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+
+
+    
+
