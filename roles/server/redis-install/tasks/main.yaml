@@ -1,0 +1,74 @@
+- name: Add EPEL repository
+  yum:
+    name: "{{ epel_rpm_url }}"
+    state: present
+- name: Yum update and install redis
+  yum:
+    name: redis
+    state: latest
+    update_cache: true
+- name: update redis bind address /etc/redis.conf
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: '^bind 127.0.0.1'
+    line: "bind 127.0.0.1 {{ inventory_hostname }}"
+- name: update masterauth <password> /etc/redis.conf
+  lineinfile:
+    path: /etc/redis.conf
+    line: "masterauth {{ redis_password }}"
+- name: update requirepass <password> /etc/redis.conf
+  lineinfile:
+    path: /etc/redis.conf
+    line: "requirepass {{ redis_password }}"
+- name: update slave configs /etc/redis.conf
+  lineinfile:
+    path: /etc/redis.conf
+    line: slaveof {{ groups["redis"][0] }} 6379
+  when: hostvars[inventory_hostname]['ansible_default_ipv4']['address'] != groups["redis"][0]  
+- name: Enable and start redis
+  service:
+    name: redis
+    state: started
+    enabled: true
+- name: Check if firewalld is installed
+  yum:
+    list: firewalld
+  register: firewalld_op
+- name: Open tcp port {{ redis_port }} for dashboard access
+  firewalld:
+    port: "{{ redis_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+- name: Verify if redis ping works locally
+  shell: redis-cli -a "{{ redis_password }}" -h "{{ inventory_hostname }}" ping
+  register: redis_ping
+- debug: var=redis_ping.stdout_lines  
+- fail:
+    msg: "Redis is not pinging"
+  when: redis_ping.rc != 0
+- block:  
+  - name: Verify redis cluster status
+    shell: redis-cli -a xxxxx info replication | grep Replication -A3
+    register: cluster_status
+  - debug: var=cluster_status.stdout_lines  
+  when: hostvars[inventory_hostname]['ansible_default_ipv4']['address'] == groups["redis"][0]
+- name: Create /etc/redis-sentinel.conf
+  template:
+    src: redis_sentinel_conf.j2
+    dest: /etc/redis-sentinel.conf
+    owner: redis
+    group: redis
+    mode: 0644
+- name: Enable and start redis sentinel
+  service:
+    name: redis-sentinel
+    state: started
+    enabled: true
+- block:  
+  - name: Verify redis sentinel cluster status
+    shell: redis-cli -a xxxxx -p {{ sentinel_port }} info sentinel
+    register: sentinel_cluster_status
+  - debug: var=sentinel_cluster_status.stdout_lines  
+  when: hostvars[inventory_hostname]['ansible_default_ipv4']['address'] == groups["redis"][0]

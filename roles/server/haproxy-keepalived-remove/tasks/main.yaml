@@ -17,7 +17,7 @@
   yum:
       list: firewalld
   register: firewalld_op
-- name: Close tcp port {{ sensu_api_port }} for dashboard access
+- name: Close tcp port {{ sensu_api_port }} {{ rabbitmq_vip_port }} {{ dashboard_port }} for dashboard access
   firewalld:
     port: "{{ item }}/tcp"
     permanent: true

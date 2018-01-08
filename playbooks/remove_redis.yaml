@@ -1,0 +1,4 @@
+- hosts: redis
+  become: true
+  roles:
+    - server/redis-remove

@@ -1,0 +1,34 @@
+- name: Disable sensu repository
+  yum_repository:
+    name: sensu
+    description: EPEL YUM repo
+    baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
+    gpgcheck: no
+    state: absent
+- name: Remove Redis
+  yum:
+    name: redis
+    state: absent
+- name: Remove /etc/redis.conf
+  file:
+    path: /etc/redis.conf
+    state: absent
+- name: Remove /etc/redis-sentinel.conf
+  file:
+    path: /etc/redis-sentinel.conf
+    state: absent
+- name: Check if firewalld is installed
+  yum:
+      list: firewalld
+  register: firewalld_op
+- name: Close tcp port {{ redis_port }}
+  firewalld:
+    port: "{{ redis_port }}/tcp"
+    permanent: true
+    state: disabled
+    immediate: true
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+
+
+    
+
