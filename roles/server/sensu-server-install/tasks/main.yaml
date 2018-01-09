@@ -1,0 +1,62 @@
+- name: Add sensu repository
+  yum_repository:
+    name: sensu
+    description: EPEL YUM repo
+    baseurl: "{{ sensu_download_url }}"
+    gpgcheck: no
+    enabled: true
+- name: Yum update and install sensu
+  yum:
+    name: sensu
+    state: latest
+    update_cache: true
+- name: Configure /etc/sensu/conf.d/redis.json
+  template:
+    src: redis_json.j2
+    dest: /etc/sensu/conf.d/redis.json
+    owner: sensu
+    group: sensu
+    mode: 0644
+- name: Configure /etc/sensu/conf.d/rabbitmq.json
+  template:
+    src: rabbitmq_json.j2
+    dest: /etc/sensu/conf.d/rabbitmq.json
+    owner: sensu
+    group: sensu
+    mode: 0644
+- name: Configure /etc/sensu/conf.d/api.json
+  template:
+    src: api_json.j2
+    dest: /etc/sensu/conf.d/api.json
+    owner: sensu
+    group: sensu
+    mode: 0644
+- name: Configure /etc/sensu/conf.d/client.json
+  template:
+    src: client_json.j2
+    dest: /etc/sensu/conf.d/client.json
+    owner: sensu
+    group: sensu
+    mode: 0644
+- name: Configure /etc/sensu/conf.d/transport.json
+  template:
+    src: transport_json.j2
+    dest: /etc/sensu/conf.d/transport.json
+    owner: sensu
+    group: sensu
+    mode: 0644
+- name: Enable and start sensu server and sensu client
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  with_items:
+    - sensu-server
+    - sensu-client
+- name: Verify if sensu server and client are running
+  shell: systemctl status sensu-server
+  register: sensu_status    
+- debug: var=sensu_status.stdout   
+- fail:
+    msg: "Sensu server is not running"
+  when: sensu_status.stdout.find("running") == -1  

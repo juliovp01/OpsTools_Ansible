@@ -1,0 +1,6 @@
+- hosts: uchiwa
+  become: true
+#  vars:
+#    haproxy_vip: 192.0.2.251
+  roles:
+    - server/uchiwa-install

@@ -1,0 +1,58 @@
+global
+    log         127.0.0.1 local2
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     40000
+    user        haproxy
+    group       haproxy
+    daemon
+
+defaults
+    log global
+    option contstats
+    option dontlognull
+    retries 3
+    mode tcp
+
+frontend rabbitmq
+    bind {{ haproxy_vip }}:{{rabbitmq_vip_port }}
+    default_backend rabbit-nodes
+
+backend rabbit-nodes
+    balance roundrobin
+    {% for r in groups["rabbitmq"] %}
+    server  {{ hostvars[r].ansible_hostname}} {{ hostvars[r].inventory_hostname }}:{{ rabbitmq_port }} check
+    {% endfor %}
+
+frontend sensu-api
+    bind {{ haproxy_vip }}:{{ sensu_api_port }}
+    default_backend sensu-api-nodes
+
+backend sensu-api-nodes
+    balance roundrobin
+    {% for s in groups["sensu-api"] %}
+    server  {{ hostvars[s].ansible_hostname}} {{ hostvars[s].inventory_hostname }}:{{ sensu_api_port }} check
+    {% endfor %}
+
+frontend uchiwa
+    bind {{ haproxy_vip }}:{{ dashboard_port }}
+    default_backend uchiwa-nodes
+
+backend uchiwa-nodes
+    balance roundrobin
+    {% for u in groups["uchiwa"] %}
+    server  {{ hostvars[u].ansible_hostname}} {{ hostvars[u].inventory_hostname }}:{{ dashboard_port }} check
+    {% endfor %}
+
+
+#---------------------------------------------------------------------
+# Stats.
+#---------------------------------------------------------------------
+listen stats {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8080
+    mode http
+    stats enable
+    stats uri /
+    #stats hide-version
+    stats realm HAProxy\ Statistics
+    stats auth admin:passwd
+

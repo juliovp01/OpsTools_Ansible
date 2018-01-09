@@ -1,0 +1,4 @@
+- hosts: sensu-api
+  become: true
+  roles:
+    - server/sensu-api-remove

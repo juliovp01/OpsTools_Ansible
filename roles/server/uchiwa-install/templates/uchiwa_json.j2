@@ -1,0 +1,16 @@
+{
+  "sensu": [
+    {
+      "name": "{{ datacenter_name }}",
+      "host": "{{ haproxy_vip }}",
+      "port": {{ sensu_api_port }},
+      "timeout": 10
+    }
+  ],
+  "uchiwa": {
+    "host": "0.0.0.0",
+    "port": {{ uchiwa_port }},
+    "refresh": 10
+  }
+}
+

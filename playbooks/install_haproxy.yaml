@@ -1,0 +1,19 @@
+- hosts: rabbitmq
+  become: true
+  tasks:
+    - name: Run setup on rabbitmq servers to gather facts
+      setup:
+- hosts: sensu-api
+  become: true
+  tasks:
+    - name: Run setup on sensu-api servers to gather facts
+      setup:
+- hosts: uchiwa
+  become: true
+  tasks:
+    - name: Run setup on uchiwa servers to gather facts
+      setup:
+- hosts: haproxy
+  become: true
+  roles:
+    - server/haproxy-keepalived-install

@@ -1,0 +1,21 @@
+{
+  "redis": {
+    "password": "{{ redis_password }}",
+    "master": "mymaster",
+    "sentinels": [
+      {
+        "host": "{{ groups['sensu-api'][0] }}",
+        "port": {{ sentinel_port }}
+      },
+      {
+        "host": "{{ groups['sensu-api'][1] }}",
+        "port": {{ sentinel_port }}
+      },
+      {
+        "host": "{{ groups['sensu-api'][2] }}"",
+        "port": {{ sentinel_port }}
+      }
+    ]
+  }
+}
+

@@ -1,0 +1,21 @@
+uchiwa_port: 3000
+datacenter_name: "raleigh-lab1"
+haproxy_vip: 192.0.2.252
+sensu_api_port: 4567
+sensu_download_url: "https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/"
+rabbitmq_vip_port: 5670
+rabbitmq_port: 5672
+rabbitmq_vhost: sensu
+rabbitmq_user: sensu
+rabbitmq_password: "xxxxx"
+sentinel_port: 26379
+env_name: "Raleigh-Lab"
+redis_port: 6379
+redis_password: "xxxxx"
+dashboard_port: 3000
+keepalived_from_email: "keepalived@example.com"
+keepalived_to_email: "sysadmins@example.com"
+vrrp_rid: 52
+smtp_server: 1.1.1.1
+epel_rpm_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+sensu_sentinel_conf_url: "/etc/redis-sentinel.conf http://sensuapp.org/docs/1.0/files/sentinel.conf"

@@ -1,0 +1,31 @@
+{
+  "rabbitmq": [
+    {
+      "host": "{{ groups['rabbitmq'][0] }}",
+      "port": {{ rabbitmq_port }},
+      "vhost": "/{{ rabbitmq_vhost }}",
+      "user": "{{ rabbitmq_user }}",
+      "password": "{{ rabbitmq_password }}",
+      "heartbeat": 30,
+      "prefetch": 50
+    },
+    {
+      "host": "{{ groups['rabbitmq'][1] }}",
+      "port": {{ rabbitmq_port }},
+      "vhost": "/{{ rabbitmq_vhost }}",
+      "user": "{{ rabbitmq_user }}",
+      "password": "{{ rabbitmq_password }}",
+      "heartbeat": 30,
+      "prefetch": 50
+    },
+    {
+      "host": "{{ groups['rabbitmq'][2] }}",
+      "port": {{ rabbitmq_port }},
+      "vhost": "/{{ rabbitmq_vhost }}",
+      "user": "{{ rabbitmq_user }}",
+      "password": "{{ rabbitmq_password }}",
+      "heartbeat": 30,
+      "prefetch": 50
+    }
+]
+}

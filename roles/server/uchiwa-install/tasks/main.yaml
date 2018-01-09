@@ -1,0 +1,48 @@
+- name: Add sensu repository
+  yum_repository:
+    name: sensu
+    description: EPEL YUM repo
+    baseurl: "{{ sensu_download_url }}"
+    gpgcheck: no
+    enabled: true
+- name: Yum update and install sensu
+  yum:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  with_items:
+    - sensu
+    - uchiwa
+- name: Configure /etc/sensu/uchiwa.json
+  template:
+    src: uchiwa_json.j2
+    dest: /etc/sensu/uchiwa.json
+    owner: uchiwa
+    group: uchiwa
+    mode: 0644
+- name: Enable and start uchiwa
+  service:
+    name: uchiwa
+    state: started
+    enabled: true
+- name: Check if firewalld is installed
+  yum:
+    list: firewalld
+  register: firewalld_op
+- name: Open tcp port {{ dashboard_port }} for dashboard access
+  firewalld:
+    port: "{{ dashboard_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+- name: Verify if Uchiwa is listening on TCP port {{ dashboard_port }}
+  get_url:
+    url: "http://{{ ansible_default_ipv4.address }}:{{ dashboard_port }}/#/info"
+    dest: /tmp
+  register: dashboard_access
+- fail:
+    msg: "Uchiwa dashboard is not listening on port {{ dashboard_port }} on server {{ ansible_default_ipv4.address }}"
+  when: dashboard_access.status_code != 200
+  
+
