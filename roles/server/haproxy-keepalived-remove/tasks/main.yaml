@@ -10,6 +10,7 @@
   file:
     path: /etc/haproxy
     state: absent
+
 - name: Remove keepalived config /etc/keepalived.conf
   file:
     path: /etc/keepalived.conf
