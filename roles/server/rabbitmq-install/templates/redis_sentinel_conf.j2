@@ -1,0 +1,11 @@
+protected-mode no
+daemonize yes
+pidfile /var/run/redis/redis-sentinel.pid
+port 26379
+sentinel monitor mymaster {{ groups["redis"][0] }} {{ redis_port }} 2
+sentinel auth-pass mymaster {{ redis_password }}
+sentinel down-after-milliseconds mymaster 30000
+sentinel parallel-syncs mymaster 1
+sentinel failover-timeout mymaster 180000
+
+

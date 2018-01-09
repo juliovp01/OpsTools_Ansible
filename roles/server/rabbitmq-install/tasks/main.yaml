@@ -1,0 +1,109 @@
+- name: Check if firewalld is installed
+  yum:
+    list: firewalld
+  register: firewalld_op
+- name: Open tcp port {{ rabbitmq_port }} , {{ erlang_cluster_port }} and {{ epmd_port }}
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  with_items:
+    - "{{ rabbitmq_port }}"
+    - "{{ erlang_cluster_port }}"
+    - "{{ epmd_port }}"
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+- name: Add EPEL repository
+  yum:
+    name: "{{ epel_rpm_url }}"
+    state: present
+- name: Yum update and install prerequisites erlang and socat
+  yum:
+    name: "{{ item }}"
+    state: latest
+    update_cache: true
+  with_items:
+    - erlang
+    - socat
+- name: Install rabbitmq
+  yum:
+    name: https://www.rabbitmq.com/releases/rabbitmq-server/v3.6.9/rabbitmq-server-3.6.9-1.el6.noarch.rpm
+    state: present
+- name: Enable and start rabbitmq
+  service:
+    name: rabbitmq-server
+    state: started
+    enabled: true
+- name: Change erlang cookie permission from 0600 to 0666
+  file:
+    path: /var/lib/rabbitmq/.erlang.cookie
+    mode: 0666
+- block:  
+  - name: Copy the Erlang cookie from master to slaves
+    synchronize:
+      src: /var/lib/rabbitmq/.erlang.cookie
+      dest: /var/lib/rabbitmq/.erlang.cookie
+      group: yes
+      owner: yes
+    delegate_to: "{{ groups['rabbitmq'][0] }}"
+  - name: Change erlang cookie permission from 0666 to 0600
+    file:
+      path: /var/lib/rabbitmq/.erlang.cookie
+      mode: 0600
+  - name: Restart rabbitmq
+    service:
+      name: rabbitmq-server
+      state: restarted
+  rescue:
+  - debug: msg="Rabbitmq failed to restart. Trying to kill any existing process and restart"
+  - name: Kill any existing rabbitmq, erlang process
+    shell: "pkill {{ item }} "
+    ignore_errors: true
+    with_items:
+      - erlang
+      - rabbitmq
+      - beam.smp
+  - name: Restart rabbitmq
+    service:
+      name: rabbitmq-server
+      state: restarted
+  when: inventory_hostname != groups['rabbitmq'][0]
+- block:  
+  - name: Stop RabbitMQ Apps on slaves
+    shell: rabbitmqctl stop_app
+  - name: Join slaves to rabbitmq cluster on master
+    shell:  rabbitmqctl join_cluster rabbit@{{ hostvars[groups['rabbitmq'][0]].ansible_nodename }}
+  - name: Start RabbitMQ Apps on slaves
+    shell: rabbitmqctl start_app
+  when: inventory_hostname != groups['rabbitmq'][0]
+- block:  
+  - name: Change erlang cookie permission from 0666 to 0600
+    file:
+      path: /var/lib/rabbitmq/.erlang.cookie
+      mode: 0600
+  - name: Create sensu rabbitmq vhost
+    rabbitmq_vhost:
+      name: "/{{ rabbitmq_vhost}}"
+      state: present
+  - name: Add sensu rabbitmq user
+    rabbitmq_user:
+      user: "{{ rabbitmq_user }}"
+      password: "{{ rabbitmq_password }}"
+      vhost: "/{{ rabbitmq_vhost }}"
+      configure_priv: .*
+      read_priv: .*
+  - name: Set cluster name
+    shell: rabbitmqctl set_cluster_name sensu_transport
+  - name: Verify if rabbitmq cluster is formed
+    shell: rabbitmqctl cluster_status
+    register: cluster_status
+  - debug: var=cluster_status.stdout_lines  
+  - name: Verify if sensu user is created
+    shell: rabbitmqctl list_users
+    register: user_status
+  - debug: var=user_status.stdout_lines  
+  - name: Verify if sensu vhost is created
+    shell: rabbitmqctl list_vhosts
+    register: vhosts_status
+  - debug: var=vhosts_status.stdout_lines  
+  when: inventory_hostname == groups['rabbitmq'][0]  

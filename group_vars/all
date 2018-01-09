@@ -5,6 +5,8 @@ sensu_api_port: 4567
 sensu_download_url: "https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/"
 rabbitmq_vip_port: 5670
 rabbitmq_port: 5672
+erlang_cluster_port: 25672
+epmd_port: 4369
 rabbitmq_vhost: sensu
 rabbitmq_user: sensu
 rabbitmq_password: "xxxxx"

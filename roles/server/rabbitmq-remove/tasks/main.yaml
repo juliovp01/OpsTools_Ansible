@@ -1,0 +1,38 @@
+- name: Remove Rabbitmq , erlang and socat
+  yum:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - rabbitmq-server
+    - erlang
+    - socat
+- name: Remove /var/lib/rabbitmq
+  file:
+    path: /var/lib/rabbitmq
+    state: absent
+- name: Check if firewalld is installed
+  yum:
+      list: firewalld
+  register: firewalld_op
+- name: Close tcp port {{ rabbitmq_port }}
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: disabled
+    immediate: true
+  with_items:
+      - "{{ rabbitmq_port }}"
+      - "{{ erlang_cluster_port }}"
+      - "{{ epmd_port }}"
+
+  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
+- name: Reboot server
+  shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+  async: 1
+  poll: 0
+  ignore_errors: true
+- name: Wait for system to boot up
+  wait_for: host= "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
+  connection: local
+- debug:
+    msg: "We're back again. Running on {{ inventory_hostname }}"
