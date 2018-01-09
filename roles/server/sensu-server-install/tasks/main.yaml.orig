@@ -5,13 +5,19 @@
     baseurl: "{{ sensu_download_url }}"
     gpgcheck: no
     enabled: true
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Yum update and install sensu
   yum:
     name: sensu
     state: latest
     update_cache: true
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Configure /etc/sensu/conf.d/redis.json
   template:
     src: redis_json.j2
@@ -19,7 +25,10 @@
     owner: sensu
     group: sensu
     mode: 0644
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Configure /etc/sensu/conf.d/rabbitmq.json
   template:
     src: rabbitmq_json.j2
@@ -27,7 +36,10 @@
     owner: sensu
     group: sensu
     mode: 0644
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Configure /etc/sensu/conf.d/api.json
   template:
     src: api_json.j2
@@ -35,7 +47,10 @@
     owner: sensu
     group: sensu
     mode: 0644
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Configure /etc/sensu/conf.d/client.json
   template:
     src: client_json.j2
@@ -43,7 +58,10 @@
     owner: sensu
     group: sensu
     mode: 0644
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Configure /etc/sensu/conf.d/transport.json
   template:
     src: transport_json.j2
@@ -51,34 +69,30 @@
     owner: sensu
     group: sensu
     mode: 0644
+<<<<<<< HEAD
+=======
 
-- name: Enable and start sensu api and sensu client
+>>>>>>> upstream/master
+- name: Enable and start sensu server and sensu client
   service:
     name: "{{ item }}"
     state: started
     enabled: true
   with_items:
-    - sensu-api
+    - sensu-server
     - sensu-client
+<<<<<<< HEAD
+=======
 
-- name: Check if firewalld is installed
-  yum:
-    list: firewalld
-  register: firewalld_op
-
-- name: Open tcp port {{ sensu-api-port }}for dashboard access
-  firewalld:
-    port: "{{ sensu_api_port }}/tcp"
-    permanent: true
-    state: enabled
-    immediate: true
-  when: firewalld_op.results|selectattr("yumstate", "match", "installed")|list|length != 0
-
-- name: Verify if sensu API is listening on TCP port {{ sensu_api_port }}
-  get_url:
-    url: "http://{{ ansible_default_ipv4.address }}:{{ sensu_api_port }}/info"
-    dest: /tmp
-  register: sensu_api_access
+>>>>>>> upstream/master
+- name: Verify if sensu server and client are running
+  shell: systemctl status sensu-server
+  register: sensu_status    
+- debug: var=sensu_status.stdout   
 - fail:
-    msg: "Sensu API is not listening on port {{ sensu_api_port }} on server {{ ansible_default_ipv4.address }}"
-  when: sensu_api_access.status_code != 200
+    msg: "Sensu server is not running"
+<<<<<<< HEAD
+  when: sensu_status.stdout.find("running") == -1  
+=======
+  when: sensu_status.stdout.find("running") == -1  
+>>>>>>> upstream/master

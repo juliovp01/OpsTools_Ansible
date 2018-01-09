@@ -5,28 +5,37 @@
     baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
     gpgcheck: no
     state: absent
+<<<<<<< HEAD
+=======
 
-- name: Remove sensu and uchiwa
+>>>>>>> upstream/master
+- name: Remove sensu 
   yum:
-    name: "{{ item }}"
+    name: sensu
     state: absent
-  with_items:
-    - sensu
-    - uchiwa
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Remove sensu directory /etc/sensu
   file:
     path: /etc/sensu
     state: absent
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Check if firewalld is installed
   yum:
       list: firewalld
   register: firewalld_op
+<<<<<<< HEAD
+=======
 
-- name: Close tcp port 3000 for dashboard access
+>>>>>>> upstream/master
+- name: Close tcp port {{ sensu_api_port }} for dashboard access
   firewalld:
-    port: "{{ dashboard_port }}/tcp"
+    port: "{{ sensu_api_port }}/tcp"
     permanent: true
     state: disabled
     immediate: true

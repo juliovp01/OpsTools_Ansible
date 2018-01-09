@@ -5,28 +5,45 @@
     baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
     gpgcheck: no
     state: absent
+<<<<<<< HEAD
+=======
 
-- name: Remove sensu and uchiwa
+>>>>>>> upstream/master
+- name: Remove Redis
   yum:
-    name: "{{ item }}"
+    name: redis
     state: absent
-  with_items:
-    - sensu
-    - uchiwa
+<<<<<<< HEAD
+=======
 
-- name: Remove sensu directory /etc/sensu
+>>>>>>> upstream/master
+- name: Remove /etc/redis.conf
   file:
-    path: /etc/sensu
+    path: /etc/redis.conf
     state: absent
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
+- name: Remove /etc/redis-sentinel.conf
+  file:
+    path: /etc/redis-sentinel.conf
+    state: absent
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 - name: Check if firewalld is installed
   yum:
       list: firewalld
   register: firewalld_op
+<<<<<<< HEAD
+=======
 
-- name: Close tcp port 3000 for dashboard access
+>>>>>>> upstream/master
+- name: Close tcp port {{ redis_port }}
   firewalld:
-    port: "{{ dashboard_port }}/tcp"
+    port: "{{ redis_port }}/tcp"
     permanent: true
     state: disabled
     immediate: true

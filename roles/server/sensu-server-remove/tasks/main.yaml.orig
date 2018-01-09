@@ -5,12 +5,18 @@
     baseurl: https://sensu.global.ssl.fastly.net/yum/$releasever/$basearch/
     gpgcheck: no
     state: absent
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Remove sensu 
   yum:
     name: sensu
     state: absent
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Remove sensu directory /etc/sensu
   file:
     path: /etc/sensu

@@ -5,7 +5,10 @@
   with_items:
     - keepalived
     - haproxy
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Remove haproxy directory /etc/haproxy
   file:
     path: /etc/haproxy
@@ -14,12 +17,18 @@
   file:
     path: /etc/keepalived.conf
     state: absent
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Check if firewalld is installed
   yum:
       list: firewalld
   register: firewalld_op
+<<<<<<< HEAD
+=======
 
+>>>>>>> upstream/master
 - name: Close tcp port {{ sensu_api_port }} {{ rabbitmq_vip_port }} {{ dashboard_port }} for dashboard access
   firewalld:
     port: "{{ item }}/tcp"
