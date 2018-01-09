@@ -1,0 +1,4 @@
+- hosts: rabbitmq
+  become: true
+  roles:
+    - server/rabbitmq-remove

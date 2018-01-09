@@ -41,8 +41,10 @@
 - name: Wait for system to boot up
   wait_for: host= "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
   connection: local
+
 - debug:
     msg: "We're back again. Running on {{ inventory_hostname }}"  
+
 - name: Enable and start keepalived and haproxy
   service:
     name: "{{ item }}"
@@ -73,9 +75,14 @@
   shell: systemctl status keepalived
   register: keepalived_status
 
+- name: Verify if keepalives running
+  shell: systemctl status keepalived
+  register: keepalived_status
+
 - name: Verify if haproxy is running
   shell: systemctl status haproxy
   register: haproxy_status
+
 - fail:
      msg: "Sensu server is not running"
   when: keepalived_status.stdout.find("running") == -1 or haproxy_status.stdout.find("running") == -1
