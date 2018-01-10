@@ -1,0 +1,71 @@
+sensu_overcloud_api_checks:
+  - name: cinder-api
+  - name: cinder-volume
+  - name: glance-api
+  - name: glance_image_exists
+  - name: glance_upload
+  - name: neutron-api
+  - name: neutron_floating_ip
+  - name: nova-api
+  - name: nova_instance
+  - name: keystone-api
+
+sensu_overcloud_systemd_checks:
+  - name: aodh-evaluator
+  - name: aodh-listener
+  - name: aodh-notifier
+  - name: ceilometer-central
+  - name: ceilometer-collector
+  - name: ceilometer-notification
+  - name: ceilometer-polling
+  - name: cinder-api
+  - name: cinder-scheduler
+  - name: cinder-volume
+  - name: glance-api
+  - name: glance-registry
+  - name: haproxy
+    service: haproxy
+  - name: heat-api
+  - name: heat-api-cfn
+  - name: heat-api-cloudwatch
+  - name: heat-engine
+  - name: memcached
+    service: memcached
+  - name: neutron-api
+    service: neutron-server
+  - name: neutron-l3-agent
+    service: neutron-l3-agent
+  - name: neutron-metadata-agent
+    service: neutron-metadata-agent
+  - name: neutron-ovs-agent
+    service: neutron-openvswitch-agent
+  - name: nova-api
+  - name: nova-compute
+  - name: nova-conductor
+  - name: nova-consoleauth
+  - name: nova-libvirt
+    service: libvirtd
+  - name: nova-novncproxy
+  - name: nova-scheduler
+  - name: pacemaker
+    service: pacemaker
+  - name: swift-proxy
+
+# A list of sensu checks for service managed as resources in pacemaker
+sensu_overcloud_checks_pcs:
+  - name: rabbitmq-clone
+  - name: galera
+
+sensu_overcloud_compute_checks:
+  - name: nova-compute
+    subscribers: ["overcloud_computes"]
+  - name: neutron-ovs-agent
+    subscribers: ["overcloud_computes"]
+  - name: nova-libvirt
+    subscribers: ["overcloud_computes"]
+  - name: ceilometer-compute
+    subscribers: ["overcloud_computes"]
+
+# A list of sensu checks that will run on sensu server
+sensu_remote_checks: []
+os_auth_args: 

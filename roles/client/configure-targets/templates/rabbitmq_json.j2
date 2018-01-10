@@ -1,0 +1,12 @@
+{
+  "rabbitmq":
+    {
+      "host": "{{ haproxy_vip }}",
+      "port": {{ rabbitmq_vip_port }},
+      "vhost": "/{{ rabbitmq_vhost }}",
+      "user": "{{ rabbitmq_user }}",
+      "password": "{{ rabbitmq_password }}",
+      "heartbeat": 30,
+      "prefetch": 50
+    }
+}

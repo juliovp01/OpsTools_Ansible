@@ -1,0 +1,40 @@
+{
+  "client": {
+    "name": {{ ansible_nodename }},
+    "address": {{ inventory_hostname }},
+    "subscriptions": [
+      "overcloud_controllers",
+      "overcloud_computes",
+      "all"
+    ],
+    "redact": [
+      "password",
+      "passwd",
+      "pass",
+      "api_key",
+      "api_token",
+      "access_key",
+      "secret_key",
+      "private_key",
+      "secret"
+    ],
+    "socket": {
+      "bind": "127.0.0.1",
+      "port": 3030
+    },
+    "safe_mode": false,
+    "api": {
+      "critical": 20,
+      "warning": 10
+    },
+    "openstack": {
+      "auth_url": "{{ os_auth_url }}",
+      "password": "{{ os_password }}",
+      "region": "regionOne",
+      "tenant_name": "{{ os_tenant_name }}",
+      "username": "{{ os_username }}"
+    },
+    "keepalive": {
+    }
+  }
+}

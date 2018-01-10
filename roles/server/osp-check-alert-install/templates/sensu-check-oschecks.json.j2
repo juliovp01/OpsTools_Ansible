@@ -1,0 +1,7 @@
+"check-{{ check.name }}": {
+    "command": "/usr/libexec/openstack-monitoring/checks/oschecks-check_{{ check.name|replace('-', '_') }} --os-username {{ os_username }} --os-password {{ os_password }} --os-tenant-name {{ os_tenant_name }}  --os-auth-url {{ os_auth_url }}",
+    "subscribers": {{ check.subscribers|default(["overcloud_controllers"])|to_json }},
+    "handle": true,
+    "handler": "mail",
+    "interval": {{ check.interval|default(60) }}
+}

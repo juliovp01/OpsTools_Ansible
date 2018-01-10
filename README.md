@@ -1,4 +1,3 @@
-# ansible_deploy_sensu_ha
 Ansible playbooks to deploy highly available sensu infrastructure
 
 # Prerequisites
@@ -9,6 +8,7 @@ Ansible playbooks to deploy highly available sensu infrastructure
 * DNS or hosts files are configured for name resolution(critical for rabbitmq cluster)
 * Firewall ports are opened between target servers being monitored and Sensu infrastructure
 * Firewall ports are opened between uchiwa dashboard and users 
+* Local MTA postfix is configured to send emails from sensu servers for alerts
 # Package versions
 
 |Package           |Version      |Ports                                                     |
