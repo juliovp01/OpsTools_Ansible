@@ -21,3 +21,8 @@ vrrp_rid: 52
 smtp_server: 1.1.1.1
 epel_rpm_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
 sensu_sentinel_conf_url: "/etc/redis-sentinel.conf http://sensuapp.org/docs/1.0/files/sentinel.conf"
+sensu_alerts_email: "sysadmins@example.com"
+os_username: admin 
+os_password: xxBzd97sFKDNYGZA6zYpqCBVe 
+os_tenant_name: admin  
+os_auth_url: "http://10.12.32.27:5000/v2.0"

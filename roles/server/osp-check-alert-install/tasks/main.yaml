@@ -1,0 +1,27 @@
+- name: Create mail handler configs on sensu server for alerts
+  template:
+    src: mail_handler_json.j2
+    dest: /etc/sensu/conf.d/mail_handler.json
+  when: inventory_hostname in groups["sensu-servers"]  
+
+- name: Configure sensu checks on to sensu server and API /etc/sensu/conf.d
+  template:
+    src: 'templates/{{ item }}.json.j2'
+    dest: '/etc/sensu/conf.d/{{ item }}.json'
+    owner: sensu
+    group: sensu
+  with_items:
+    - sensu-osp-checks
+
+- name: Restart sensu server
+  service:
+    name: sensu-server
+    state: restarted
+  when: inventory_hostname in groups["sensu-servers"]  
+
+- name: Restart sensu api
+  service:
+    name: sensu-api
+    state: restarted
+  when: inventory_hostname in groups["sensu-api"]  
+

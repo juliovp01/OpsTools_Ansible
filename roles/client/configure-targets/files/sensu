@@ -1,0 +1,7 @@
+# allow using only the binary name instead of the full path in check definitions
+Defaults:sensu secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+# allow all sensu-install provided checks and metrics which follow the proper naming convention with all possible arguments
+sensu ALL=(ALL) NOPASSWD: /usr/local/bin/check*.rb *
+sensu ALL=(ALL) NOPASSWD: /usr/local/bin/metrics*.rb *
+sensu ALL=(ALL) NOPASSWD: /usr/libexec/openstack-monitoring/checks/oschecks* *
+
