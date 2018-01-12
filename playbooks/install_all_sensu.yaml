@@ -1,13 +1,13 @@
-#- hosts: redis
-#  become: true
-#  roles:
-#    - server/redis-install
-#  tags: redis  
-#- hosts: rabbitmq
-#  become: true
-#  roles:
-#    - server/rabbitmq-install
-#  tags: rabbitmq  
+- hosts: redis
+  become: true
+  roles:
+    - server/redis-install
+  tags: redis  
+- hosts: rabbitmq
+  become: true
+  roles:
+    - server/rabbitmq-install
+  tags: rabbitmq  
 - hosts: sensu-api
   become: true
   roles:
@@ -31,3 +31,11 @@
   roles:
     - server/haproxy-keepalived-install
   tags: haproxy  
+- hosts: sensu-servers,sensu-api
+  become: true
+  roles:
+    - server/osp-check-alert-install
+- hosts: osp-controllers,osp-computes
+  become: true
+  roles:
+    - client/configure-targets
