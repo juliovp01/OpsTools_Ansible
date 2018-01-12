@@ -50,7 +50,7 @@ ansible-playbook playbooks/install_all_sensu.yaml
 ```
 To configure target hosts for sensu client ,
 ```
-ansible-playbook playbooks/configure_targets.yaml
+ansible-playbook playbooks/configure_targets_sensu.yaml
 ```
 
 ## To Do
@@ -95,7 +95,7 @@ ansible-playbook playbooks/install_all_prometheus.yaml
 ```
 To configure target hosts for collectd client ,
 ```
-ansible-playbook playbooks/configure_collectd_targets.yaml
+ansible-playbook playbooks/configure_targets_collectd.yaml
 ```
 
 ## To Do

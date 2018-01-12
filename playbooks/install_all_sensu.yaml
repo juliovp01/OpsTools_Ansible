@@ -3,11 +3,13 @@
   roles:
     - server/redis-install
   tags: redis  
+
 - hosts: rabbitmq
   become: true
   roles:
     - server/rabbitmq-install
   tags: rabbitmq  
+
 - hosts: sensu-api
   become: true
   roles:
