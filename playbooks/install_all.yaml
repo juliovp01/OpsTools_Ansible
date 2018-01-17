@@ -1,0 +1,8 @@
+- include: install_redis.yaml
+- include: install_rabbitmq.yaml
+- include: install_sensu_server.yaml
+- include: install_sensu_api.yaml
+- include: install_uchiwa.yaml
+- include: install_haproxy.yaml
+- include: install_osp_checks_alerts.yaml
+

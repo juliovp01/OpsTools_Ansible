@@ -1,0 +1,7 @@
+- include: remove_haproxy.yaml
+- include: remove_sensu_api.yaml
+- include: remove_sensu_server.yaml
+- include: remove_uchiwa.yaml
+- include: remove_rabbitmq.yaml
+- include: remove_redis.yaml
+
